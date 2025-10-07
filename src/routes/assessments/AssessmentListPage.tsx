@@ -145,41 +145,35 @@ export function AssessmentListPage() {
           <table className="w-full table-fixed border-collapse text-sm">
             <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
               <tr>
-                <th className="px-4 py-3 font-semibold">Name</th>
-                <th className="px-4 py-3 font-semibold">Description</th>
-                <th className="px-4 py-3 font-semibold text-center">Questions</th>
-                <th className="px-4 py-3 font-semibold text-center">Invited</th>
-                <th className="px-4 py-3 font-semibold text-center">Started</th>
-                <th className="px-4 py-3 font-semibold text-center">Completed</th>
-                <th className="px-4 py-3 font-semibold">Updated</th>
-                <th className="px-4 py-3 font-semibold text-right">Actions</th>
+                <th className="w-[32%] px-4 py-3 font-semibold">Name</th>
+                <th className="w-[40%] px-4 py-3 font-semibold">Description</th>
+                <th className="w-[72px] px-3 py-3 text-center font-semibold">Questions</th>
+                <th className="w-[72px] px-3 py-3 text-center font-semibold">Invited</th>
+                <th className="w-[72px] px-3 py-3 text-center font-semibold">Started</th>
+                <th className="w-[88px] px-3 py-3 text-center font-semibold">Completed</th>
+                <th className="w-[120px] px-4 py-3 font-semibold">Updated</th>
+                <th className="w-[44px] px-2 py-3 text-right font-semibold"><span className="sr-only">Actions</span></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {loading
                 ? Array.from({ length: PAGE_SIZE }).map((_, index) => (
-                    <tr key={index} className="h-24 animate-pulse align-top">
-                      <td className="px-4 py-4 align-top">
-                        <div className="space-y-2">
-                          <div className="h-4 w-32 rounded bg-slate-200" />
-                          <div className="h-4 w-24 rounded bg-slate-100" />
-                        </div>
+                    <tr key={index} className="h-[51px] min-h-[51px] animate-pulse align-middle">
+                      <td className="w-[32%] px-4 py-2 align-middle">
+                        <div className="h-4 w-32 rounded bg-slate-200" />
                       </td>
-                      <td className="px-4 py-4 align-top">
-                        <div className="space-y-2">
-                          <div className="h-4 w-48 rounded bg-slate-200" />
-                          <div className="h-4 w-36 rounded bg-slate-100" />
-                        </div>
+                      <td className="w-[40%] px-4 py-2 align-middle">
+                        <div className="h-4 w-48 rounded bg-slate-200" />
                       </td>
                       {Array.from({ length: 3 }).map((__, metricIndex) => (
-                        <td key={metricIndex} className="px-4 py-4 align-top text-center">
+                        <td key={metricIndex} className="w-[72px] px-3 py-2 text-center align-middle">
                           <div className="mx-auto h-4 w-10 rounded bg-slate-200" />
                         </td>
                       ))}
-                      <td className="px-4 py-4 align-top">
+                      <td className="w-[88px] px-3 py-2 text-center align-middle">
                         <div className="h-4 w-28 rounded bg-slate-200" />
                       </td>
-                      <td className="px-4 py-4 align-top text-right">
+                      <td className="w-[44px] px-2 py-2 text-right align-middle">
                         <div className="ml-auto h-8 w-8 rounded bg-slate-200" />
                       </td>
                     </tr>
@@ -206,26 +200,26 @@ export function AssessmentListPage() {
                         <tr
                           key={template.id}
                           onClick={() => handleNavigateToTemplate(template.id)}
-                          className="h-24 cursor-pointer align-top bg-white transition hover:bg-slate-50"
+                          className="h-12 min-h-[48px] cursor-pointer align-middle bg-white transition hover:bg-slate-50"
                         >
-                          <td className="px-4 py-4 align-top font-medium text-slate-900">
-                            <div className="line-clamp-2 min-h-[48px]">
+                          <td className="w-[32%] px-4 py-2 align-middle font-semibold text-slate-900">
+                            <span className="relative block max-w-full overflow-hidden whitespace-nowrap pr-6 text-sm after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:w-6 after:bg-gradient-to-r after:from-transparent after:to-white">
                               {template.name || 'Untitled template'}
-                            </div>
+                            </span>
                           </td>
-                          <td className="px-4 py-4 align-top text-slate-500">
-                            <span className="line-clamp-2 text-xs sm:text-sm">
+                          <td className="w-[40%] px-4 py-2 align-middle text-slate-500">
+                            <span className="relative block max-w-full overflow-hidden whitespace-nowrap pr-6 text-xs sm:text-sm after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:w-6 after:bg-gradient-to-r after:from-transparent after:to-white">
                               {template.description?.trim() || 'No description provided.'}
                             </span>
                           </td>
-                          <td className="px-4 py-4 align-top text-center font-medium text-slate-700">
+                          <td className="w-[72px] px-3 py-2 align-middle text-center font-medium text-slate-700">
                             {template.questionCount}
                           </td>
-                          <td className="px-4 py-4 align-top text-center text-slate-500">—</td>
-                          <td className="px-4 py-4 align-top text-center text-slate-500">—</td>
-                          <td className="px-4 py-4 align-top text-center text-slate-500">—</td>
-                          <td className="px-4 py-4 align-top text-slate-500">{formatDate(template.updated_at ?? template.created_at)}</td>
-                          <td className="px-4 py-4 align-top text-right" onClick={(event) => event.stopPropagation()}>
+                          <td className="w-[72px] px-3 py-2 align-middle text-center text-slate-500">—</td>
+                          <td className="w-[72px] px-3 py-2 align-middle text-center text-slate-500">—</td>
+                          <td className="w-[88px] px-3 py-2 align-middle text-center text-slate-500">—</td>
+                          <td className="w-[120px] px-4 py-2 align-middle text-slate-500">{formatDate(template.updated_at ?? template.created_at)}</td>
+                          <td className="w-[44px] px-2 py-2 align-middle text-right" onClick={(event) => event.stopPropagation()}>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
                                 <button
