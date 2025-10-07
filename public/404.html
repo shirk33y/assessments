@@ -7,8 +7,15 @@
     <script>
       (function () {
         var redirectBase = '/assessments/';
-        var currentPath = window.location.pathname.replace(redirectBase, '');
-        var target = redirectBase + (currentPath || '');
+        var path = window.location.pathname;
+        if (!path.startsWith(redirectBase)) {
+          window.location.replace(redirectBase);
+          return;
+        }
+        var relative = path.substring(redirectBase.length);
+        var search = window.location.search;
+        var hash = window.location.hash;
+        var target = redirectBase + (relative ? '#' + relative : '') + hash + search;
         window.location.replace(target);
       })();
     </script>
