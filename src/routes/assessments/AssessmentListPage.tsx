@@ -10,7 +10,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
@@ -97,7 +96,7 @@ export function AssessmentListPage() {
       setLoading(false)
     }
 
-    fetchTemplates().catch((fetchError) => {
+    void fetchTemplates().catch((fetchError) => {
       console.error('Unexpected error loading templates', fetchError)
       setError(fetchError instanceof Error ? fetchError.message : 'Failed to load assessments')
       setLoading(false)
@@ -105,7 +104,7 @@ export function AssessmentListPage() {
   }, [page, session?.user?.id])
 
   const handleNavigateToTemplate = (templateId: string) => {
-    navigate(`/assessments/${templateId}/edit`)
+    void navigate(`/assessments/${templateId}/edit`)
   }
 
   const handlePrev = () => setPage((prev) => Math.max(1, prev - 1))
@@ -231,9 +230,24 @@ export function AssessmentListPage() {
                                 </button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
-                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                <DropdownMenuItem
+                                  onSelect={() => {
+                                    void navigate(`/assessments/${template.id}/preview`, {
+                                      state: {
+                                        templateName: template.name || 'Untitled template',
+                                        templateDescription: template.description?.trim() || '',
+                                      },
+                                    })
+                                  }}
+                                >
+                                  Preview
+                                </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem onSelect={() => navigate(`/assessments/${template.id}/edit`)}>
+                                <DropdownMenuItem
+                                  onSelect={() => {
+                                    void navigate(`/assessments/${template.id}/edit`)
+                                  }}
+                                >
                                   Edit template
                                 </DropdownMenuItem>
                                 <DropdownMenuItem disabled className="text-slate-400">

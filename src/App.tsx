@@ -7,6 +7,8 @@ import { LoginPage } from './routes/auth/LoginPage'
 import { AssessmentListPage } from './routes/assessments/AssessmentListPage'
 import { CreateAssessmentPage } from './routes/assessments/CreateAssessmentPage'
 import { AssessmentPlayerPage } from './routes/assessments/AssessmentPlayerPage'
+import { AssessmentPreviewPage } from './routes/assessments/AssessmentPreviewPage'
+import { AssessmentPreviewSummaryPage } from './routes/assessments/AssessmentPreviewSummaryPage'
 
 export default function App() {
   return (
@@ -25,6 +27,8 @@ export default function App() {
             <Route index element={<AssessmentListPage />} />
             <Route path="assessments/new" element={<CreateAssessmentPage />} />
             <Route path="assessments/:templateId/edit" element={<CreateAssessmentPage />} />
+            <Route path="assessments/:templateId/preview" element={<AssessmentPreviewPage />} />
+            <Route path="assessments/:templateId/preview/summary" element={<AssessmentPreviewSummaryPage />} />
           </Route>
 
           <Route path="/invite/:token" element={<AssessmentPlayerPage />} />

@@ -6,6 +6,12 @@ import {
   type QuestionType,
 } from '../types'
 
+const isQuestionType = (value: string): value is QuestionType =>
+  QUESTION_TYPE_OPTIONS.some((option) => option.value === value)
+
+const isScaleVariant = (value: string): value is QuestionDraft['scaleVariant'] =>
+  SCALE_VARIANTS.some((variant) => variant.value === value)
+
 type QuestionListProps = {
   questions: QuestionDraft[]
   onAddQuestion: () => void
@@ -106,7 +112,10 @@ function QuestionCard({
   }
 
   const handleTypeChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    onUpdateQuestion(question.id, { type: event.target.value as QuestionType }, ['choices', 'scale'])
+    const nextType = event.target.value
+    if (isQuestionType(nextType)) {
+      onUpdateQuestion(question.id, { type: nextType }, ['choices', 'scale'])
+    }
   }
 
   const handleScoreWeightChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -116,7 +125,7 @@ function QuestionCard({
   const questionTypeMeta = QUESTION_TYPE_OPTIONS.find((option) => option.value === question.type)
 
   return (
-    <div className="space-y-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div className="space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Question {index + 1}</p>
@@ -355,9 +364,12 @@ function ScaleConfigurator({
           <select
             id={`${question.id}-scale-variant`}
             value={question.scaleVariant}
-            onChange={(event) =>
-              onUpdateQuestion({ scaleVariant: event.target.value as QuestionDraft['scaleVariant'] })
-            }
+            onChange={(event) => {
+              const nextVariant = event.target.value
+              if (isScaleVariant(nextVariant)) {
+                onUpdateQuestion({ scaleVariant: nextVariant })
+              }
+            }}
             className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
           >
             {SCALE_VARIANTS.map((variant) => (
