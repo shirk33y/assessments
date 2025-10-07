@@ -1,3 +1,4 @@
+import React from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import { ProtectedRoute } from './components/ProtectedRoute'
@@ -9,9 +10,14 @@ import { CreateAssessmentPage } from './routes/assessments/CreateAssessmentPage'
 import { AssessmentPlayerPage } from './routes/assessments/AssessmentPlayerPage'
 
 export default function App() {
+  const basePath = React.useMemo(() => {
+    const url = import.meta.env.BASE_URL ?? '/'
+    return url.endsWith('/') && url !== '/' ? url.slice(0, -1) : url
+  }, [])
+
   return (
     <AuthProvider>
-      <BrowserRouter>
+      <BrowserRouter basename={basePath}>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
 

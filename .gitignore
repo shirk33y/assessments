@@ -3,5 +3,7 @@ node_modules
 /dist
 .cache/
 .temp/
-.env*
+.env.local
+.env.*
+!.env
 .DS_Store
