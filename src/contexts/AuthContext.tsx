@@ -5,7 +5,12 @@ import { supabase } from '../lib/supabaseClient'
 type AuthContextValue = {
   session: Session | null
   loading: boolean
+  error: string | null
   signInWithGoogle: () => Promise<void>
+  signInWithPassword: (email: string, password: string) => Promise<void>
+  signUpWithPassword: (email: string, password: string) => Promise<void>
+  resetPassword: (email: string) => Promise<void>
+  clearError: () => void
   signOut: () => Promise<void>
 }
 
@@ -14,6 +19,7 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined)
 export function AuthProvider({ children }: PropsWithChildren) {
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     let isMounted = true
@@ -24,6 +30,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
         if (!isMounted) return
         setSession(data.session)
         setLoading(false)
+        setError(null)
       })
       .catch((error: unknown) => {
         console.error('Failed to get session', error)
@@ -33,6 +40,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
     const { data } = supabase.auth.onAuthStateChange((_event, authSession) => {
       setSession(authSession)
       setLoading(false)
+      setError(null)
     })
 
     return () => {
@@ -49,21 +57,81 @@ export function AuthProvider({ children }: PropsWithChildren) {
     })
     if (error) {
       console.error('OAuth error:', error.message)
+      setError(error.message)
       throw error
     }
+    setError(null)
   }
+
+  const signInWithPassword = async (email: string, password: string) => {
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password,
+    })
+
+    if (signInError) {
+      console.error('Password sign-in error:', signInError.message)
+      setError(signInError.message)
+      throw signInError
+    }
+    setError(null)
+  }
+
+  const signUpWithPassword = async (email: string, password: string) => {
+    const { error: signUpError } = await supabase.auth.signUp({
+      email: email.trim(),
+      password,
+      options: {
+        emailRedirectTo: new URL(`${import.meta.env.BASE_URL ?? '/'}login`, window.location.origin).toString(),
+      },
+    })
+
+    if (signUpError) {
+      console.error('Password sign-up error:', signUpError.message)
+      setError(signUpError.message)
+      throw signUpError
+    }
+    setError(null)
+  }
+
+  const resetPassword = async (email: string) => {
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      redirectTo: new URL(`${import.meta.env.BASE_URL ?? '/'}login`, window.location.origin).toString(),
+    })
+
+    if (resetError) {
+      console.error('Password reset error:', resetError.message)
+      setError(resetError.message)
+      throw resetError
+    }
+    setError(null)
+  }
+
+  const clearError = () => setError(null)
 
   const signOut = async () => {
     const { error } = await supabase.auth.signOut()
     if (error) {
       console.error('Sign out error:', error.message)
+      setError(error.message)
       throw error
     }
+    setError(null)
   }
 
   const value = useMemo<AuthContextValue>(
-    () => ({ session, loading, signInWithGoogle, signOut }),
-    [session, loading],
+    () => ({
+      session,
+      loading,
+      error,
+      signInWithGoogle,
+      signInWithPassword,
+      signUpWithPassword,
+      resetPassword,
+      clearError,
+      signOut,
+    }),
+    [session, loading, error],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
