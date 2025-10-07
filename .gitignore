@@ -1,5 +1,7 @@
 node_modules
 .dist
 /dist
+.cache/
+.temp/
 .env*
 .DS_Store

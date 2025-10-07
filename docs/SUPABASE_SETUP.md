@@ -43,6 +43,169 @@ create trigger on_auth_user_created
 
 These variables will be used by the Supabase client in the frontend.
 
+### 4.6 Assessment templates, invitations, and responses
+Run the following SQL to support assessment templates, questions, invitations, and response capture.
+
+```sql
+-- Assessment templates authored by HR/admins
+create table if not exists public.assessment_templates (
+  id uuid primary key default gen_random_uuid(),
+  owner_id uuid not null references public.profiles(id) on delete cascade,
+  name text not null,
+  description text,
+  is_active boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+-- Template questions (single_choice, multi_choice, scale)
+create table if not exists public.assessment_questions (
+  id uuid primary key default gen_random_uuid(),
+  template_id uuid not null references public.assessment_templates(id) on delete cascade,
+  position int not null,
+  prompt text not null,
+  details text,
+  question_type text not null check (question_type in ('single_choice','multi_choice','scale')),
+  score_weight numeric not null default 1,
+  scale_min int not null default 1,
+  scale_max int not null default 5,
+  scale_variant text not null default 'number' check (scale_variant in ('number','stars','hearts','custom')),
+  created_at timestamptz not null default now()
+);
+
+create unique index if not exists assessment_questions_template_position_idx
+  on public.assessment_questions(template_id, position);
+
+-- Choice options for single/multi choice questions
+create table if not exists public.assessment_question_choices (
+  id uuid primary key default gen_random_uuid(),
+  question_id uuid not null references public.assessment_questions(id) on delete cascade,
+  value int not null,
+  label text not null,
+  description text,
+  created_at timestamptz not null default now()
+);
+
+create unique index if not exists assessment_question_choices_unique
+  on public.assessment_question_choices(question_id, value);
+
+-- Optional scale value labels (per point)
+create table if not exists public.assessment_scale_labels (
+  id uuid primary key default gen_random_uuid(),
+  question_id uuid not null references public.assessment_questions(id) on delete cascade,
+  scale_value int not null,
+  label text,
+  description text,
+  unique(question_id, scale_value)
+);
+
+-- Invitations and unique tokens
+create table if not exists public.assessment_invitations (
+  id uuid primary key default gen_random_uuid(),
+  template_id uuid not null references public.assessment_templates(id) on delete cascade,
+  invitee_email text not null,
+  invitee_name text,
+  token text not null unique,
+  status text not null default 'draft' check (status in ('draft','pending','sent','completed','expired')),
+  expires_at timestamptz,
+  sent_at timestamptz,
+  completed_at timestamptz,
+  created_at timestamptz not null default now()
+);
+
+-- Assessment responses
+create table if not exists public.assessment_responses (
+  id uuid primary key default gen_random_uuid(),
+  invitation_id uuid not null references public.assessment_invitations(id) on delete cascade,
+  respondent_profile_id uuid references public.profiles(id) on delete set null,
+  started_at timestamptz not null default now(),
+  submitted_at timestamptz,
+  score_total numeric,
+  unique(invitation_id)
+);
+
+create index if not exists assessment_responses_invitation_idx
+  on public.assessment_responses(invitation_id);
+
+-- Individual answers (JSON payload stores answer data per type)
+create table if not exists public.assessment_answers (
+  id uuid primary key default gen_random_uuid(),
+  response_id uuid not null references public.assessment_responses(id) on delete cascade,
+  question_id uuid not null references public.assessment_questions(id) on delete cascade,
+  answer jsonb not null,
+  score numeric,
+  created_at timestamptz not null default now(),
+  unique(response_id, question_id)
+);
+```
+
+Add RLS policies tailored to your workflow (draft example policies below). Adjust filters to match your RBAC design.
+
+```sql
+alter table public.assessment_templates enable row level security;
+alter table public.assessment_questions enable row level security;
+alter table public.assessment_question_choices enable row level security;
+alter table public.assessment_scale_labels enable row level security;
+alter table public.assessment_invitations enable row level security;
+alter table public.assessment_responses enable row level security;
+alter table public.assessment_answers enable row level security;
+
+-- Owners (HR/admins) manage their templates
+create policy "templates_owner_crud" on public.assessment_templates
+  for all using (auth.uid() = owner_id);
+
+-- Templates readable by owner and managers (customize as needed)
+create policy "templates_read" on public.assessment_templates
+  for select using (
+    auth.uid() = owner_id
+    or exists (
+      select 1 from public.profiles p
+      where p.id = auth.uid() and p.role in ('hr_admin','manager')
+    )
+  );
+
+-- Questions inherit template ownership permissions
+create policy "questions_owner_crud" on public.assessment_questions
+  for all using (
+    exists (
+      select 1 from public.assessment_templates t
+      where t.id = template_id and t.owner_id = auth.uid()
+    )
+  );
+
+create policy "questions_read" on public.assessment_questions
+  for select using (
+    exists (
+      select 1 from public.assessment_templates t
+      where t.id = template_id and (
+        t.owner_id = auth.uid()
+        or exists (
+          select 1 from public.profiles p
+          where p.id = auth.uid() and p.role in ('hr_admin','manager')
+        )
+      )
+    )
+  );
+
+-- Invitation access: owner or invite token holder (validated via security definer RPC later)
+create policy "invitations_owner_manage" on public.assessment_invitations
+  for all using (
+    exists (
+      select 1 from public.assessment_templates t
+      where t.id = template_id and t.owner_id = auth.uid()
+    )
+  );
+
+create policy "responses_owner_read" on public.assessment_responses
+  for select using (
+    exists (
+      select 1 from public.assessment_invitations i
+      join public.assessment_templates t on t.id = i.template_id
+      where i.id = invitation_id and t.owner_id = auth.uid()
+    )
+  );
+```
+
 ## 3) Configure Auth
 - Go to `Authentication → Providers`:
   - Enable Email (recommended) and optionally OAuth providers (Google, GitHub, etc.).
