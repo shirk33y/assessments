@@ -4,7 +4,6 @@ import { AuthProvider } from './contexts/AuthContext'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { AppLayout } from './layouts/AppLayout'
 import { LoginPage } from './routes/auth/LoginPage'
-import { DashboardPage } from './routes/dashboard/DashboardPage'
 import { AssessmentListPage } from './routes/assessments/AssessmentListPage'
 import { CreateAssessmentPage } from './routes/assessments/CreateAssessmentPage'
 import { AssessmentPlayerPage } from './routes/assessments/AssessmentPlayerPage'
@@ -23,8 +22,7 @@ export default function App() {
               </ProtectedRoute>
             }
           >
-            <Route index element={<DashboardPage />} />
-            <Route path="assessments" element={<AssessmentListPage />} />
+            <Route index element={<AssessmentListPage />} />
             <Route path="assessments/new" element={<CreateAssessmentPage />} />
             <Route path="assessments/:templateId/edit" element={<CreateAssessmentPage />} />
           </Route>

@@ -132,7 +132,10 @@ export function AssessmentListPage() {
             team.
           </p>
         </div>
-        <Button asChild>
+        <Button
+          asChild
+          className="bg-blue-600 text-white shadow-sm hover:bg-blue-500 focus-visible:ring-blue-500"
+        >
           <Link to="/assessments/new">Create template</Link>
         </Button>
       </header>
@@ -155,12 +158,30 @@ export function AssessmentListPage() {
             <tbody className="divide-y divide-slate-100">
               {loading
                 ? Array.from({ length: PAGE_SIZE }).map((_, index) => (
-                    <tr key={index} className="animate-pulse">
-                      {Array.from({ length: 8 }).map((__, cellIndex) => (
-                        <td key={cellIndex} className="px-4 py-4">
-                          <div className="h-4 rounded bg-slate-200" />
+                    <tr key={index} className="h-24 animate-pulse align-top">
+                      <td className="px-4 py-4 align-top">
+                        <div className="space-y-2">
+                          <div className="h-4 w-32 rounded bg-slate-200" />
+                          <div className="h-4 w-24 rounded bg-slate-100" />
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 align-top">
+                        <div className="space-y-2">
+                          <div className="h-4 w-48 rounded bg-slate-200" />
+                          <div className="h-4 w-36 rounded bg-slate-100" />
+                        </div>
+                      </td>
+                      {Array.from({ length: 3 }).map((__, metricIndex) => (
+                        <td key={metricIndex} className="px-4 py-4 align-top text-center">
+                          <div className="mx-auto h-4 w-10 rounded bg-slate-200" />
                         </td>
                       ))}
+                      <td className="px-4 py-4 align-top">
+                        <div className="h-4 w-28 rounded bg-slate-200" />
+                      </td>
+                      <td className="px-4 py-4 align-top text-right">
+                        <div className="ml-auto h-8 w-8 rounded bg-slate-200" />
+                      </td>
                     </tr>
                   ))
                 : error
@@ -185,24 +206,26 @@ export function AssessmentListPage() {
                         <tr
                           key={template.id}
                           onClick={() => handleNavigateToTemplate(template.id)}
-                          className="cursor-pointer bg-white transition hover:bg-slate-50"
+                          className="h-24 cursor-pointer align-top bg-white transition hover:bg-slate-50"
                         >
-                          <td className="truncate px-4 py-4 font-medium text-slate-900">
-                            {template.name || 'Untitled template'}
+                          <td className="px-4 py-4 align-top font-medium text-slate-900">
+                            <div className="line-clamp-2 min-h-[48px]">
+                              {template.name || 'Untitled template'}
+                            </div>
                           </td>
-                          <td className="px-4 py-4 text-slate-500">
+                          <td className="px-4 py-4 align-top text-slate-500">
                             <span className="line-clamp-2 text-xs sm:text-sm">
                               {template.description?.trim() || 'No description provided.'}
                             </span>
                           </td>
-                          <td className="px-4 py-4 text-center font-medium text-slate-700">
+                          <td className="px-4 py-4 align-top text-center font-medium text-slate-700">
                             {template.questionCount}
                           </td>
-                          <td className="px-4 py-4 text-center text-slate-500">—</td>
-                          <td className="px-4 py-4 text-center text-slate-500">—</td>
-                          <td className="px-4 py-4 text-center text-slate-500">—</td>
-                          <td className="px-4 py-4 text-slate-500">{formatDate(template.updated_at ?? template.created_at)}</td>
-                          <td className="px-4 py-4 text-right" onClick={(event) => event.stopPropagation()}>
+                          <td className="px-4 py-4 align-top text-center text-slate-500">—</td>
+                          <td className="px-4 py-4 align-top text-center text-slate-500">—</td>
+                          <td className="px-4 py-4 align-top text-center text-slate-500">—</td>
+                          <td className="px-4 py-4 align-top text-slate-500">{formatDate(template.updated_at ?? template.created_at)}</td>
+                          <td className="px-4 py-4 align-top text-right" onClick={(event) => event.stopPropagation()}>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
                                 <button
@@ -219,27 +242,14 @@ export function AssessmentListPage() {
                                 <DropdownMenuItem onSelect={() => navigate(`/assessments/${template.id}/edit`)}>
                                   Edit template
                                 </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onSelect={(event: Event) => {
-                                    event.preventDefault()
-                                  }}
-                                >
+                                <DropdownMenuItem disabled className="text-slate-400">
                                   Invite participants
                                 </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onSelect={(event: Event) => {
-                                    event.preventDefault()
-                                  }}
-                                >
+                                <DropdownMenuItem disabled className="text-slate-400">
                                   Clone template
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem
-                                  variant="destructive"
-                                  onSelect={(event: Event) => {
-                                    event.preventDefault()
-                                  }}
-                                >
+                                <DropdownMenuItem disabled variant="destructive" className="text-slate-400">
                                   Delete template
                                 </DropdownMenuItem>
                               </DropdownMenuContent>

@@ -11,10 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useAuth } from '../contexts/AuthContext'
 
-const NAV_LINKS = [
-  { to: '/', label: 'Dashboard', end: true },
-  { to: '/assessments', label: 'Assessments' },
-]
+const NAV_LINKS = [{ to: '/', label: 'Assessments', end: true }]
 
 export function AppLayout() {
   const { session, signOut } = useAuth()
@@ -77,32 +74,45 @@ export function AppLayout() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="ml-auto flex items-center gap-2 rounded-full border border-transparent px-3 py-2 text-slate-600 hover:border-slate-200 hover:bg-slate-100"
+                  className="ml-auto flex items-center gap-2 rounded-full border border-slate-200/0 px-3 py-2 text-slate-600 shadow-sm transition hover:border-slate-200 hover:bg-slate-100"
                 >
                   <Avatar className="h-8 w-8">
                     <AvatarImage src={avatarUrl} alt={userEmail || 'User avatar'} />
                     <AvatarFallback>{initials}</AvatarFallback>
                   </Avatar>
-                  <span className="hidden text-xs font-medium text-slate-600 sm:inline">
+                  <span className="hidden text-sm font-medium text-slate-600 sm:inline">
                     {userEmail || 'Account'}
                   </span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" sideOffset={8} className="w-56">
-                  <DropdownMenuLabel>Signed in as</DropdownMenuLabel>
-                  <div>{userEmail || 'Account'}</div>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>Settings</DropdownMenuItem>
-                  <DropdownMenuItem>Profile</DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onSelect={() => {
-                      void handleSignOut()
-                    }}
-                  >
-                    Sign out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
+              <DropdownMenuContent
+                align="end"
+                sideOffset={10}
+                className="w-60 rounded-xl border border-slate-200 bg-white/95 p-2 text-sm shadow-xl backdrop-blur"
+              >
+                <DropdownMenuLabel className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                  Account
+                </DropdownMenuLabel>
+                <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-left text-sm font-medium text-slate-700">
+                  {userEmail || 'Account'}
+                </div>
+                <DropdownMenuSeparator className="my-2" />
+                <DropdownMenuItem disabled className="text-slate-400">
+                  Settings
+                </DropdownMenuItem>
+                <DropdownMenuItem disabled className="text-slate-400">
+                  Profile
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="my-2" />
+                <DropdownMenuItem
+                  data-variant="destructive"
+                  onSelect={() => {
+                    void handleSignOut()
+                  }}
+                >
+                  Sign out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
             </DropdownMenu>
           </div>
         </header>
