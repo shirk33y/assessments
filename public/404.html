@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="refresh" content="0; url=/assessments/" />
+    <title>Redirecting…</title>
+    <script>
+      (function () {
+        var redirectBase = '/assessments/';
+        var currentPath = window.location.pathname.replace(redirectBase, '');
+        var target = redirectBase + (currentPath || '');
+        window.location.replace(target);
+      })();
+    </script>
+  </head>
+  <body>
+    <p>Redirecting…</p>
+  </body>
+</html>
